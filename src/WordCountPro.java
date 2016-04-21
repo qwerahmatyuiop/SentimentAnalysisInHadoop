@@ -25,8 +25,9 @@ public class WordCountPro {
 
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			 try{
-			 positiveWords = getList("positive-words.text", new ArrayList<String>());
-			 negativeWords = getList("negative-words.text", new ArrayList<String>());	
+			 positiveWords = getList("positive-words-combined.text", new ArrayList<String>());
+			 negativeWords = getList("negative-words-combined.text", new ArrayList<String>());	
+			System.out.println(positiveWords.size());
 			 }catch(Exception e){
 			 	System.out.println("ERROR HERE!");
 			 }
@@ -46,15 +47,16 @@ public class WordCountPro {
             		context.write(word, one);
             	}
             	else{
-            		System.out.println("yasfoo");
+            		context.write(word, negone);
             	}
          	  }
          	}
 
 		}
 		public static ArrayList<String> getList(String input, ArrayList<String> AL) throws Exception{
+
  			try{
-	            Path pt=new Path("hdfs://"+input);//Location of file in HDFS
+	            Path pt=new Path("hdfs://masternode:9000/user/ubuntu/dictionary/"+input);//Location of file in HDFS
 	            FileSystem fs = FileSystem.get(new Configuration());
 	            BufferedReader br=new BufferedReader(new InputStreamReader(fs.open(pt)));
 	            String line;
@@ -83,7 +85,7 @@ public class WordCountPro {
 	}
 	public static void main(String[] args) throws Exception{
 		Configuration conf = new Configuration();
-
+		System.out.println("fs.default.name : - " + conf.get("fs.default.name"));
 		Job job = new Job(conf, "WordCountJob");
 		job.setJarByClass(WordCountPro.class);
 
